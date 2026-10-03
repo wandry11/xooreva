@@ -1,0 +1,281 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Xooreva Publisher</title>
+<style>
+  :root{--bg:#16102e;--card:#231a45;--line:#3a2f66;--text:#fff;--muted:#b9b2d6;--accent:#ffc83c;--tt:#fe2c55;--ok:#3ddc97;--err:#ff8a8a}
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--text);font-family:system-ui,-apple-system,Segoe UI,Roboto,sans-serif;line-height:1.45}
+  header{display:flex;align-items:center;justify-content:space-between;padding:16px 24px;border-bottom:1px solid var(--line)}
+  header .brand{display:flex;align-items:center;gap:10px;font-weight:800;letter-spacing:.5px}
+  header .logo{width:34px;height:34px;border-radius:8px;background:linear-gradient(#2a1452,#6e1585);display:grid;place-items:center;color:var(--accent);font-weight:900}
+  main{max-width:760px;margin:0 auto;padding:24px 16px 64px}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:20px;margin-bottom:18px}
+  h1{font-size:22px;margin:0 0 6px} h2{font-size:17px;margin:0 0 14px}
+  p.muted,.muted{color:var(--muted);font-size:14px}
+  button{font:inherit;border:0;border-radius:10px;padding:11px 18px;font-weight:700;cursor:pointer}
+  button:disabled{opacity:.45;cursor:not-allowed}
+  .btn-tt{background:#000;color:#fff;border:1px solid #444;display:inline-flex;align-items:center;gap:10px}
+  .btn-main{background:var(--tt);color:#fff}
+  .btn-ghost{background:transparent;color:var(--muted);border:1px solid var(--line)}
+  .acct{display:flex;align-items:center;gap:12px}
+  .acct img{width:48px;height:48px;border-radius:50%;background:#000;object-fit:cover}
+  label.field{display:block;font-weight:600;font-size:14px;margin:16px 0 6px}
+  input[type=file],textarea,select{width:100%;background:#120c26;color:var(--text);border:1px solid var(--line);border-radius:10px;padding:10px;font:inherit}
+  textarea{min-height:80px;resize:vertical}
+  video{width:100%;max-height:420px;border-radius:10px;background:#000;margin-top:10px;display:none}
+  .row{display:flex;gap:18px;flex-wrap:wrap}
+  .check{display:flex;align-items:center;gap:8px;font-size:14px}
+  .switch{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-top:16px}
+  .sub{margin:10px 0 0 4px;padding-left:12px;border-left:2px solid var(--line);display:none}
+  .note{font-size:13px;color:var(--muted);margin-top:6px}
+  .consent{font-size:13px;color:var(--muted);margin:18px 0 12px}
+  .consent a{color:var(--accent)}
+  .status{margin-top:14px;font-size:14px;white-space:pre-wrap}
+  .status.ok{color:var(--ok)} .status.err{color:var(--err)}
+  footer{text-align:center;font-size:13px;color:var(--muted);padding:20px}
+  footer a{color:var(--muted)}
+  .hidden{display:none!important}
+</style>
+</head>
+<body>
+<header>
+  <div class="brand"><div class="logo">X</div>XOOREVA PUBLISHER</div>
+  <div id="hdrAcct" class="muted"></div>
+</header>
+
+<main>
+  <!-- Not connected -->
+  <section id="viewLogin" class="card">
+    <h1>Publish Xooreva videos to TikTok</h1>
+    <p class="muted">Connect the Xooreva TikTok account to upload and post our finished videos directly from this dashboard.</p>
+    <button id="btnLogin" class="btn-tt">
+      <svg width="18" height="18" viewBox="0 0 48 48" fill="#fff" aria-hidden="true"><path d="M34.1 6c.6 4.9 3.4 7.9 8.1 8.2v5.5c-2.7.3-5.1-.6-7.9-2.3v10.2c0 13-14.2 17-19.9 7.7-3.7-6-1.4-16.5 10.5-16.9v5.8c-.9.1-1.9.4-2.7.7-2.5.8-3.9 2.4-3.5 5.2.8 5.4 10.6 7 9.8-3.6V6h5.6z"/></svg>
+      Continue with TikTok
+    </button>
+  </section>
+
+  <!-- Connected -->
+  <section id="viewApp" class="hidden">
+    <div class="card">
+      <div class="acct" style="justify-content:space-between">
+        <div class="acct">
+          <img id="avatar" alt="">
+          <div>
+            <div class="muted" style="font-size:12px">Connected TikTok account</div>
+            <div id="nickname" style="font-weight:700;font-size:17px"></div>
+          </div>
+        </div>
+        <button id="btnLogout" class="btn-ghost">Disconnect</button>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2>New post</h2>
+      <div id="creatorWarn" class="status err hidden"></div>
+
+      <label class="field" for="file">Video (MP4)</label>
+      <input id="file" type="file" accept="video/mp4,video/quicktime">
+      <video id="preview" controls playsinline></video>
+      <div id="durNote" class="note"></div>
+
+      <label class="field" for="title">Caption</label>
+      <textarea id="title" maxlength="2200" placeholder="Write a caption... #musicadominicana"></textarea>
+
+      <label class="field" for="privacy">Who can view this video</label>
+      <select id="privacy"><option value="" selected disabled>Select privacy</option></select>
+
+      <label class="field">Allow users to</label>
+      <div class="row">
+        <label class="check"><input type="checkbox" id="allowComment"> Comment</label>
+        <label class="check"><input type="checkbox" id="allowDuet"> Duet</label>
+        <label class="check"><input type="checkbox" id="allowStitch"> Stitch</label>
+      </div>
+
+      <div class="switch">
+        <div>
+          <div style="font-weight:600;font-size:14px">Disclose video content</div>
+          <div class="note">Turn on to disclose that this video promotes goods or services in exchange for something of value.</div>
+        </div>
+        <input type="checkbox" id="disclose" style="width:20px;height:20px">
+      </div>
+      <div id="discloseOpts" class="sub">
+        <label class="check"><input type="checkbox" id="yourBrand"> Your brand <span class="note">&nbsp;- you are promoting yourself or your own business.</span></label>
+        <label class="check" style="margin-top:6px"><input type="checkbox" id="brandedContent"> Branded content <span class="note">&nbsp;- you are promoting another brand or a third party.</span></label>
+        <div id="discloseHint" class="note"></div>
+      </div>
+
+      <div class="consent" id="consent"></div>
+      <button id="btnPost" class="btn-main" disabled>Post to TikTok</button>
+      <div id="status" class="status"></div>
+    </div>
+  </section>
+</main>
+
+<footer>
+  Xooreva &middot; WWS SRL &middot; <a href="terms.html">Terms of Service</a> &middot; <a href="privacy.html">Privacy Policy</a>
+</footer>
+
+<script src="config.js"></script>
+<script>
+const $ = id => document.getElementById(id);
+let token = null, creator = null, videoDur = 0;
+try { token = sessionStorage.getItem('xo_token'); } catch (e) {}
+
+const PRIVACY_LABELS = {
+  PUBLIC_TO_EVERYONE: 'Everyone',
+  MUTUAL_FOLLOW_FRIENDS: 'Friends',
+  FOLLOWER_OF_CREATOR: 'Followers',
+  SELF_ONLY: 'Only me'
+};
+
+async function api(path, opts = {}) {
+  opts.headers = Object.assign({ Authorization: 'Bearer ' + token }, opts.headers || {});
+  if (!opts.method) opts.method = 'POST';
+  const r = await fetch(XO_API + path, opts);
+  return r.json();
+}
+
+$('btnLogin').onclick = () => {
+  const state = crypto.randomUUID();
+  try { sessionStorage.setItem('xo_state', state); } catch (e) {}
+  location.href = XO_API + '/login?state=' + encodeURIComponent(state);
+};
+$('btnLogout').onclick = () => {
+  try { sessionStorage.removeItem('xo_token'); } catch (e) {}
+  location.reload();
+};
+
+async function init() {
+  if (!token) return;
+  $('viewLogin').classList.add('hidden');
+  $('viewApp').classList.remove('hidden');
+
+  const u = await api('/user', { method: 'GET' });
+  const user = u && u.data && u.data.user;
+  if (!user) { try { sessionStorage.removeItem('xo_token'); } catch (e) {} location.reload(); return; }
+  $('avatar').src = user.avatar_url || '';
+  $('hdrAcct').textContent = user.display_name;
+
+  const c = await api('/creator_info', { body: '{}', headers: { 'Content-Type': 'application/json' } });
+  if (!c.data || (c.error && c.error.code !== 'ok')) {
+    $('creatorWarn').textContent = 'This account cannot post right now: ' + (c.error && c.error.message || 'unknown error') + '. Please try again later.';
+    $('creatorWarn').classList.remove('hidden');
+    return;
+  }
+  creator = c.data;
+  $('nickname').textContent = creator.creator_nickname || user.display_name;
+  if (creator.creator_avatar_url) $('avatar').src = creator.creator_avatar_url;
+
+  for (const opt of creator.privacy_level_options || []) {
+    const o = document.createElement('option');
+    o.value = opt; o.textContent = PRIVACY_LABELS[opt] || opt;
+    $('privacy').appendChild(o);
+  }
+  if (creator.comment_disabled) { $('allowComment').disabled = true; }
+  if (creator.duet_disabled) { $('allowDuet').disabled = true; }
+  if (creator.stitch_disabled) { $('allowStitch').disabled = true; }
+  updateUI();
+}
+
+$('file').onchange = () => {
+  const f = $('file').files[0];
+  const v = $('preview');
+  if (!f) { v.style.display = 'none'; updateUI(); return; }
+  v.src = URL.createObjectURL(f);
+  v.style.display = 'block';
+  v.onloadedmetadata = () => { videoDur = v.duration; updateUI(); };
+};
+
+['title', 'privacy', 'disclose', 'yourBrand', 'brandedContent'].forEach(id => {
+  $(id).addEventListener('input', updateUI);
+  $(id).addEventListener('change', updateUI);
+});
+
+function updateUI() {
+  const disclose = $('disclose').checked;
+  $('discloseOpts').style.display = disclose ? 'block' : 'none';
+  const yb = disclose && $('yourBrand').checked;
+  const bc = disclose && $('brandedContent').checked;
+
+  // Branded content cannot be private
+  const selfOpt = [...$('privacy').options].find(o => o.value === 'SELF_ONLY');
+  if (selfOpt) {
+    selfOpt.disabled = bc;
+    selfOpt.textContent = bc ? 'Only me (branded content visibility cannot be set to private)' : 'Only me';
+    if (bc && $('privacy').value === 'SELF_ONLY') $('privacy').value = '';
+  }
+
+  let hint = '';
+  if (disclose && !yb && !bc) hint = 'You need to indicate if your content promotes yourself, a third party, or both.';
+  else if (bc) hint = "Your photo/video will be labeled as 'Paid partnership'.";
+  else if (yb) hint = "Your photo/video will be labeled as 'Promotional content'.";
+  $('discloseHint').textContent = hint;
+
+  const music = '<a href="https://www.tiktok.com/legal/page/global/music-usage-confirmation/en" target="_blank" rel="noopener">Music Usage Confirmation</a>';
+  const bcp = '<a href="https://www.tiktok.com/legal/page/global/bc-policy/en" target="_blank" rel="noopener">Branded Content Policy</a>';
+  $('consent').innerHTML = bc
+    ? "By posting, you agree to TikTok's " + bcp + " and " + music + "."
+    : "By posting, you agree to TikTok's " + music + ".";
+
+  let durOk = true;
+  if (creator && videoDur && creator.max_video_post_duration_sec) {
+    durOk = videoDur <= creator.max_video_post_duration_sec;
+    $('durNote').textContent = durOk
+      ? 'Duration ' + Math.round(videoDur) + 's (max ' + creator.max_video_post_duration_sec + 's for this account).'
+      : 'This video is too long. Maximum allowed: ' + creator.max_video_post_duration_sec + 's.';
+  }
+
+  $('btnPost').disabled = !(creator && $('file').files[0] && $('privacy').value && durOk && !(disclose && !yb && !bc));
+}
+
+$('btnPost').onclick = async () => {
+  const f = $('file').files[0];
+  const st = $('status');
+  $('btnPost').disabled = true;
+  st.className = 'status';
+  st.textContent = 'Uploading video to TikTok...';
+  const disclose = $('disclose').checked;
+  const postInfo = {
+    title: $('title').value,
+    privacy_level: $('privacy').value,
+    disable_comment: !$('allowComment').checked,
+    disable_duet: !$('allowDuet').checked,
+    disable_stitch: !$('allowStitch').checked,
+    video_cover_timestamp_ms: 1000,
+    brand_content_toggle: disclose && $('brandedContent').checked,
+    brand_organic_toggle: disclose && $('yourBrand').checked
+  };
+  try {
+    const r = await api('/publish', {
+      headers: { 'Content-Type': 'video/mp4', 'X-Post-Info': JSON.stringify(postInfo) },
+      body: f
+    });
+    if (!r.publish_id) throw new Error(JSON.stringify(r, null, 2));
+    st.textContent = 'Uploaded. TikTok is processing your post...';
+    for (let i = 0; i < 40; i++) {
+      await new Promise(res => setTimeout(res, 3000));
+      const s = await api('/status', { body: JSON.stringify({ publish_id: r.publish_id }), headers: { 'Content-Type': 'application/json' } });
+      const status = s.data && s.data.status;
+      if (status === 'PUBLISH_COMPLETE') {
+        st.className = 'status ok';
+        st.textContent = 'Posted! It may take a few minutes for the video to appear on your TikTok profile.';
+        return;
+      }
+      if (status === 'FAILED') throw new Error('TikTok could not publish the video: ' + (s.data.fail_reason || 'unknown reason'));
+      st.textContent = 'TikTok is processing your post... (' + (status || 'waiting') + ')';
+    }
+    st.textContent = 'Your video was sent. It may take a few minutes for it to appear on your TikTok profile.';
+  } catch (e) {
+    st.className = 'status err';
+    st.textContent = 'Error: ' + (e.message || e);
+    $('btnPost').disabled = false;
+  }
+};
+
+init();
+</script>
+</body>
+</html>
