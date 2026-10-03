@@ -138,10 +138,12 @@ async function api(path, opts = {}) {
   return r.json();
 }
 
-$('btnLogin').onclick = () => {
+$('btnLogin').onclick = async () => {
   const state = crypto.randomUUID();
   try { sessionStorage.setItem('xo_state', state); } catch (e) {}
-  location.href = XO_API + '/login?state=' + encodeURIComponent(state);
+  const r = await fetch(XO_API + '/login?json=1&state=' + encodeURIComponent(state));
+  const d = await r.json();
+  location.href = d.url;
 };
 $('btnLogout').onclick = () => {
   try { sessionStorage.removeItem('xo_token'); } catch (e) {}
