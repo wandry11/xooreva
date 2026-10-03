@@ -1,2 +1,2 @@
 // URL of the Cloudflare Worker backend
-var XO_API = "https://xooreva-tiktok.REPLACE.workers.dev";
+var XO_API = "https://xooreva-tiktok.wandrymartz.workers.dev";
